@@ -2,14 +2,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "backend.h"
+#include "map/map.h"
 
-#define MAXC 100
+#define MAXC 10
 #define SEP printf("\n**************************************************\n")
 
 
 int main(void)
 {
     int opcion;
+    char id[MAXC];
+    int prioridad;
+    HashMap * mapTareas = createMap(10);
     SEP;
     printf("¡Bienvenid@ al sistema para organizar tareas!\n");
 
@@ -32,8 +36,20 @@ int main(void)
         switch (opcion)
         {
         case 1:
-            printf("todo\n");
+            SEP;
+            printf("Ingrese el nombre de la tarea:\n");
+            scanf("%10[^\n]s", id);
+            getchar();
+            printf("Ingrese la prioridad de la tarea:\n");
+            scanf("%d", &prioridad);
+            getchar();
+
+            if (agregarTarea(mapTareas, id, prioridad) == 0)
+                printf("\nTarea agregada con éxito!\n");
+            else
+                printf("\nHa ocurrido un error al agregar la tarea\n");
             break;
+            
         case 2:
             printf("todo\n");
             break;
