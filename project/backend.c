@@ -85,7 +85,6 @@ List * encontrarOrden(HashMap * map)
     HashMap * nodeMap = crearGrafo(map);
     Heap * colaP = createHeap();
 
-    node * current = firstMap(nodeMap);
     bool todosVisitados = false;
     while (!todosVisitados)
     {
