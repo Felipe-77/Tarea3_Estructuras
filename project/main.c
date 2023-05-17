@@ -5,7 +5,7 @@
 #include "map/map.h"
 #include "heap/heap.h"
 
-#define MAXC 10
+#define MAXC 20
 #define SEP printf("\n**************************************************\n")
 
 
@@ -17,8 +17,9 @@ int main(void)
     int opcion;
     char id[MAXC];
     char precedente[MAXC];
+    char archivo[MAXC];
     int prioridad;
-    HashMap * mapTareas = createMap(10);
+    HashMap * mapTareas = createMap(20);
     SEP;
     printf("¡Bienvenid@ al sistema para organizar tareas!\n");
 
@@ -32,6 +33,7 @@ int main(void)
         printf("4) Marcar tarea como completada\n\n");
         printf("5) Deshacer última acción\n");
         printf("6) Cargar datos de tareas desde un archivo de texto\n\n");
+        printf("7) Mostrar una tarea\n");
         printf("0) Salir\n\n");
         SEP;
         printf(">");
@@ -70,10 +72,8 @@ int main(void)
                 printf("\nHa ocurrido un error al agregar la precedencia\n");
             break;
         case 3:
-            printf("Ingrese el nombre de la tarea:\n");
-            scanf("%10[^\n]s", id);
-            getchar();
-            mostrarTarea(mapTareas,id);
+            SEP;
+            mostrarTareasPorHacer(mapTareas);
             break;
         case 4:
             printf("todo\n");
@@ -83,7 +83,20 @@ int main(void)
 
             break;
         case 6:
-            printf("todo\n");
+            SEP;
+            printf("Ingrese el nombre del archivo:\n");
+            scanf("%20[^\n]s", archivo);
+            getchar();
+
+            importarDesdeCSV(mapTareas, archivo) ;
+            break;
+        case 7:
+            SEP;
+            printf("Ingrese el nombre de la tarea a mostrar:\n");
+            scanf("%10[^\n]s", id);
+            getchar();
+
+            mostrarTarea(mapTareas, id);
             break;
         case 0:
             printf("\n¡Hasta luego!\n");
