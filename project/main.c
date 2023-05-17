@@ -3,15 +3,20 @@
 #include <string.h>
 #include "backend.h"
 #include "map/map.h"
+#include "heap/heap.h"
 
 #define MAXC 10
 #define SEP printf("\n**************************************************\n")
+
+
+
 
 
 int main(void)
 {
     int opcion;
     char id[MAXC];
+    char precedente[MAXC];
     int prioridad;
     HashMap * mapTareas = createMap(10);
     SEP;
@@ -51,16 +56,31 @@ int main(void)
             break;
             
         case 2:
-            printf("todo\n");
+            SEP;
+            printf("Ingrese el nombre de la tarea a modificar:\n");
+            scanf("%10[^\n]s", id);
+            getchar();
+            printf("Ingrese la prioridad de la tarea precedente:\n");
+            scanf("%10[^\n]s", precedente);
+            getchar();
+
+            if (agregarPrecedencia(mapTareas, id, precedente) == 0)
+                printf("\nPrecedencia añadida con éxito!\n");
+            else
+                printf("\nHa ocurrido un error al agregar la precedencia\n");
             break;
         case 3:
-            printf("todo\n");
+            printf("Ingrese el nombre de la tarea:\n");
+            scanf("%10[^\n]s", id);
+            getchar();
+            mostrarTarea(mapTareas,id);
             break;
         case 4:
             printf("todo\n");
             break;
         case 5:
             printf("todo\n");
+
             break;
         case 6:
             printf("todo\n");
@@ -77,3 +97,6 @@ int main(void)
 
     return 0;
 }
+
+
+
