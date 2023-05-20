@@ -51,32 +51,41 @@ int agregarTarea(HashMap * mapTareas, char id[MAXC], int prioridad)
     if (searchMap(mapTareas, id) != NULL)   return 1;
    
     tarea * nueva = crearTarea(id, prioridad);
-    insertMap(mapTareas, id, nueva);
+    insertMap(mapTareas, nueva->nombre, nueva);
     return 0;
 }
 
 HashMap * crearGrafo(HashMap * map)
 {
     HashMap * nodeMap = createMap(20);
-    tarea * current = firstMap(map)->value;
+    Pair * par = firstMap(map);
+    tarea * current = par->value;
     while (current != NULL)
     {
         node * nuevo = crearNodo(current);
         for (int i = 0; i < get_size(current->precedentes); i++)  
         {
-            tarea * precedente = get(current->precedentes, i);
-            node * nodoPrecedente = searchMap(nodeMap, precedente->nombre)->value;
-            
-            if (nodoPrecedente == NULL)
+            tarea * tareaPrecedente = (tarea*)get(current->precedentes, i);
+            if (tareaPrecedente == NULL) continue;
+
+            Pair * par = searchMap(nodeMap, tareaPrecedente->nombre);
+
+            if (par == NULL)
             {
                 
-                nodoPrecedente = crearNodo(precedente);
-                insertMap(nodeMap, precedente->nombre, nodoPrecedente);
+                node * nodoPrecedente = crearNodo(tareaPrecedente);
+                insertMap(nodeMap, nodoPrecedente->nombre, nodoPrecedente);
+                append(nuevo->precedentes, nodoPrecedente);
             }
-            append(nuevo->precedentes, nodoPrecedente);
+            else
+            {
+                node * nodoPrecedente = par->value;
+                append(nuevo->precedentes, nodoPrecedente);
+            }
+            
         }
         
-        insertMap(nodeMap, current->nombre, nuevo);
+        insertMap(nodeMap, nuevo->nombre, nuevo);
         Pair * par = nextMap(map);
         if (par == NULL)    break;
         current = par->value;
@@ -111,46 +120,64 @@ tarea * crearTarea(char nombre[MAXC], int prioridad)
 
 int agregarPrecedencia(HashMap* mapTareas, char id[MAXC], char tareaPrecedente[MAXC])
 {
-    if (searchMap(mapTareas, id) == NULL)   return 1;
-    tarea* current = (tarea*)searchMap(mapTareas,id)->value;
+    Pair * par = searchMap(mapTareas, id);
+    if (par == NULL)   return 1;
+    tarea* current = (tarea*)par->value;
 
-    if (searchMap(mapTareas, tareaPrecedente) == NULL)   return 1;
-    tarea* precedente = (tarea*)searchMap(mapTareas,tareaPrecedente)->value;
+    par = searchMap(mapTareas, tareaPrecedente);
+    if (par == NULL)   return 1;
+    tarea* precedente = (tarea*)par->value;
     append(current->precedentes,precedente);
     return 0;
 }
 
 ArrayList * encontrarOrden(HashMap * map)
 {
+    
     HashMap * nodeMap = crearGrafo(map);
+    
     Heap * colaP = createHeap();
     ArrayList * orden = createList();
     while (nodeMap->size != 0)
     {
-        node * current = firstMap(nodeMap)->value;
+        Pair * par = firstMap(nodeMap);
+        if (par == NULL)    break;
+        node * current = par->value;
         while (current != NULL)
         {
+            if (current->estado != 0)
+            {
+                par = nextMap(nodeMap);
+                if (par == NULL)    break;
+                current = par->value;
+                continue;
+            }
             bool flag = true;
             for (int i = 0; i < get_size(current->precedentes); i++)
             {
-                node * nodo = get(current->precedentes, i);
+                node * nodo = (node *)get(current->precedentes, i);
                 if (nodo->estado == 0)
                 {
                     flag = false;
                     break;
                 }
             }
-            if (flag && current->estado == 0)   heap_push(colaP, current, current->prioridad);
-            Pair * par = nextMap(nodeMap);
+            if (flag){
+                heap_push(colaP, current, current->prioridad);
+                current->estado = VISITADO;
+            }
+            par = nextMap(nodeMap);
             if (par == NULL)    break;
             current = par->value;
         }
-        node * nodo = heap_top(colaP);
+        node * nodo = (node *)heap_top(colaP);
+        if (nodo == NULL)   break;
         nodo->estado = EXPLORADO;
         heap_pop(colaP);
         append(orden, nodo);
         eraseMap(nodeMap, nodo->nombre);
     }
+    
     return orden;
 }
 
@@ -159,23 +186,25 @@ void mostrarTareasPorHacer(HashMap * map)
     ArrayList * orden = encontrarOrden(map);
     for (int i = 0; i < get_size(orden); i++)
     {
-        node * current = get(orden, i);
+        node * current = (node*)get(orden, i);
         mostrarTarea(map, current->nombre);
     }
 }
 
 void mostrarTarea(HashMap* mapTareas, char id[MAXC])
 {
-    tarea* current = (tarea*)searchMap(mapTareas,id)->value;
+    Pair * par = searchMap(mapTareas, id);
+    if (par == NULL)    return;
+    tarea* current = (tarea*)par->value;
     printf("\n ---------------------------- \n");
     printf("\nTarea: %s\n",current->nombre);
     printf("Prioridad: %d\n",current->prioridad);
-    printf("Precedentes: ");
+    printf("Precedentes: \n");
     
     for (int i = 0; i < get_size(current->precedentes); i++)
     {
         tarea * precedente = get(current->precedentes, i);
-        printf("\n- %s\n",precedente->nombre);
+        printf("- %s\n",precedente->nombre);
     }
     
     printf("\n");
@@ -204,18 +233,19 @@ void importarDesdeCSV(HashMap* map, char archivo[MAXC])
         char * nombre = (char *)malloc(sizeof(char)*MAXC);
         int prioridad;
         ArrayList * precedentes = createList();
+        Pair * par;
         tarea * precedente;
 
     	while (valor != NULL) {
     		if (columna == 1){	//se guarda el nombre del jugador
         		strcpy(nombre, valor);
-				puts(nombre);
 			}
     		if (columna == 2)	//se guarda la habilidad del jugador
                 prioridad = (int)strtol(valor, NULL, 10); 	
       		if (columna > 2){
-                precedente = searchMap(map, valor)->value;
-                puts(precedente->nombre);
+                par = searchMap(map, valor);
+                if (par == NULL)    continue;
+                precedente = (tarea*)par->value;
                 append(precedentes, precedente);
 	  		}
 			valor = strtok(NULL, " ,");

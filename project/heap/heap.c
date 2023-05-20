@@ -34,7 +34,7 @@ void swap(heapElem *arr, int a, int b) {
 void heapify_u(Heap *H, int index){
 	int parent = (index - 1) / 2;
 
-	if (H->heapArray[parent].priority >= H->heapArray[index].priority)
+	if (H->heapArray[parent].priority <= H->heapArray[index].priority)
 		return;
 	else {
 		swap(H->heapArray, parent, index);
@@ -61,10 +61,10 @@ void heapify_d(Heap *H, int size, int i){
 	right_child = (2 * i) + 2;
 
 	int largest_child = i;
-  	if (left_child < size && H->heapArray[left_child].priority > H->heapArray[largest_child].priority) {
+  	if (left_child < size && H->heapArray[left_child].priority < H->heapArray[largest_child].priority) {
     	largest_child = left_child;
   	}
-  	if (right_child < size && H->heapArray[right_child].priority > H->heapArray[largest_child].priority) {
+  	if (right_child < size && H->heapArray[right_child].priority < H->heapArray[largest_child].priority) {
     	largest_child = right_child;
   	}
 
