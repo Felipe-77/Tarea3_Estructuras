@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define MAXC 20
+#define MAXC 10
 #define EXPLORADO 2
 #define VISITADO 1
 
@@ -118,6 +118,31 @@ tarea * crearTarea(char nombre[MAXC], int prioridad)
     return nueva;
 }
 
+int eliminarTarea(HashMap * mapTareas, char id[MAXC])
+{
+    Pair * par = firstMap(mapTareas);
+    if (par == NULL)    return 1;
+    tarea * current = par->value;
+    while (current != NULL)
+    {
+        for (int i = 0; i < get_size(current->precedentes); i++)
+        {
+            tarea * precedente = (tarea*)get(current->precedentes, i);
+            if (precedente == NULL) continue;
+            if (strcmp(precedente->nombre, id) == 0)
+            {
+                pop(current->precedentes, i);
+                break;
+            }
+        }
+        par = nextMap(mapTareas);
+        if (par == NULL)    break;
+        current = par->value;
+    }
+    eraseMap(mapTareas, id);
+    return 0;
+}
+
 int agregarPrecedencia(HashMap* mapTareas, char id[MAXC], char tareaPrecedente[MAXC])
 {
     Pair * par = searchMap(mapTareas, id);
@@ -184,6 +209,7 @@ ArrayList * encontrarOrden(HashMap * map)
 void mostrarTareasPorHacer(HashMap * map)
 {
     ArrayList * orden = encontrarOrden(map);
+    printf("\nTareas que faltan por hacer, ordenadas de la manera mas eficiente de realizar: \n");
     for (int i = 0; i < get_size(orden); i++)
     {
         node * current = (node*)get(orden, i);
@@ -191,10 +217,10 @@ void mostrarTareasPorHacer(HashMap * map)
     }
 }
 
-void mostrarTarea(HashMap* mapTareas, char id[MAXC])
+int mostrarTarea(HashMap* mapTareas, char id[MAXC])
 {
     Pair * par = searchMap(mapTareas, id);
-    if (par == NULL)    return;
+    if (par == NULL)    return 1;
     tarea* current = (tarea*)par->value;
     printf("\n ---------------------------- \n");
     printf("\nTarea: %s\n",current->nombre);
@@ -206,12 +232,11 @@ void mostrarTarea(HashMap* mapTareas, char id[MAXC])
         tarea * precedente = get(current->precedentes, i);
         printf("- %s\n",precedente->nombre);
     }
-    
-    printf("\n");
+    return 0;
 }
 
 
-void importarDesdeCSV(HashMap* map, char archivo[MAXC]) 
+void importarDesdeCSV(HashMap* map, char *archivo) 
 {
 	free(map);	//se libera la memoria del mapa de jugadores
 	map = createMap(20);	//se crea un nuevo mapa de jugadores

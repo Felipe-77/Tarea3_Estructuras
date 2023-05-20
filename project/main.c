@@ -17,7 +17,7 @@ int main(void)
     int opcion;
     char id[MAXC];
     char precedente[MAXC];
-    char archivo[MAXC];
+    char archivo[30];
     int prioridad;
     HashMap * mapTareas = createMap(20);
     SEP;
@@ -30,7 +30,7 @@ int main(void)
         printf("1) Agregar una tarea nueva\n");
         printf("2) Establecer precedencia\n");
         printf("3) Mostrar tareas por hacer\n");
-        printf("4) Marcar tarea como completada\n\n");
+        printf("4) Marcar tarea como completada y eliminar\n\n");
         printf("5) Deshacer última acción\n");
         printf("6) Cargar datos de tareas desde un archivo de texto\n\n");
         printf("7) Mostrar una tarea\n");
@@ -76,7 +76,15 @@ int main(void)
             mostrarTareasPorHacer(mapTareas);
             break;
         case 4:
-            printf("todo\n");
+            SEP;
+            printf("Ingrese el nombre de la tarea a eliminar:\n");
+            scanf("%10[^\n]s", id);
+            getchar();
+
+            if (eliminarTarea(mapTareas, id) == 0)
+                printf("\nTarea eliminada con éxito!\n");
+            else
+                printf("\nHa ocurrido un error al eliminar la tarea\n");
             break;
         case 5:
             printf("todo\n");
@@ -85,7 +93,7 @@ int main(void)
         case 6:
             SEP;
             printf("Ingrese el nombre del archivo:\n");
-            scanf("%20[^\n]s", archivo);
+            scanf("%30[^\n]s", archivo);
             getchar();
 
             importarDesdeCSV(mapTareas, archivo) ;
@@ -96,7 +104,9 @@ int main(void)
             scanf("%10[^\n]s", id);
             getchar();
 
-            mostrarTarea(mapTareas, id);
+            if (mostrarTarea(mapTareas, id) != 0)
+                printf("\nLa tarea no se encuentra en el sistema...\n");
+            
             break;
         case 0:
             printf("\n¡Hasta luego!\n");
