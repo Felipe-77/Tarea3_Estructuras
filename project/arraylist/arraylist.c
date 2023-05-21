@@ -10,6 +10,11 @@ typedef struct ArrayList {
     int size;
 } ArrayList;
 
+typedef struct Stack {
+    ArrayList * values;
+} Stack;
+
+
 ArrayList *createList(void) {
 
     ArrayList * nuevaLista = (ArrayList *) malloc(sizeof(ArrayList));   //Primero se reserva memoria para la lista
@@ -92,3 +97,31 @@ void clean(ArrayList * l){
 
     return;
 } 
+
+
+Stack * createStack(void){
+    Stack * nuevaPila = (Stack *) malloc(sizeof(Stack));
+    if (!nuevaPila) exit(EXIT_FAILURE);
+
+    nuevaPila->values = createList();
+
+    return nuevaPila;
+}
+void* topStack(Stack * s){
+    return get(s->values, -1);
+}
+
+void pushStack(Stack * s, void * data){
+    append(s->values, data);
+}
+
+void* popStack(Stack * s){
+    pop(s->values, -1);
+    return get(s->values, -1);
+}
+
+int get_sizeStack(Stack * s){
+    return get_size(s->values);
+}
+
+
