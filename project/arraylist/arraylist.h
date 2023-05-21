@@ -2,6 +2,7 @@
 #define ArrayList_h
 
 typedef struct ArrayList ArrayList;
+typedef struct Stack Stack;
 
 ArrayList *createList(void);
 
@@ -12,4 +13,11 @@ void* get(ArrayList * l, int i);
 int get_size(ArrayList * l);
 void clean(ArrayList * list);
 
+
+
+Stack* createStack(void);
+void pushStack(Stack * s, void * data);¨
+void* topStack(Stack * s);
+void* popStack(Stack * s);
+int get_sizeStack(Stack * s)
 #endif /* List_h */
