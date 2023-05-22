@@ -8,7 +8,9 @@
 #define MAXC 20
 #define SEP printf("\n**************************************************\n")
 
-
+#define AGREGAR_TAREA 1
+#define AGREGAR_PRECEDENCIA 2
+#define MARCAR_TAREA 3
 
 
 

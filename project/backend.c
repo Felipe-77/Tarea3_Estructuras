@@ -12,6 +12,11 @@
 #define EXPLORADO 2
 #define VISITADO 1
 
+//Macros para deshacer acciones
+#define AGREGAR_TAREA 1
+#define AGREGAR_PRECEDENCIA 2
+#define MARCAR_TAREA 3
+
 struct HashMap {
     Pair ** buckets;
     long size; //cantidad de datos/pairs en la tabla
@@ -35,6 +40,11 @@ typedef struct node
     ArrayList * precedentes;
 }node;
 
+typedef struct accion {
+    void* data;
+    int tipo;
+} accion;
+
 
 node * crearNodo(tarea * tarea)
 {
@@ -52,6 +62,7 @@ int agregarTarea(HashMap * mapTareas, char id[MAXC], int prioridad)
    
     tarea * nueva = crearTarea(id, prioridad);
     insertMap(mapTareas, nueva->nombre, nueva);
+
     return 0;
 }
 
@@ -153,6 +164,8 @@ int agregarPrecedencia(HashMap* mapTareas, char id[MAXC], char tareaPrecedente[M
     if (par == NULL)   return 1;
     tarea* precedente = (tarea*)par->value;
     append(current->precedentes,precedente);
+    
+
     return 0;
 }
 
@@ -233,6 +246,70 @@ int mostrarTarea(HashMap* mapTareas, char id[MAXC])
         printf("- %s\n",precedente->nombre);
     }
     return 0;
+}
+
+/*typedef struct accion {
+    void* data;
+    int tipo;
+} accion;
+*/
+void copyArraylist(ArrayList* a, ArrayList* b)
+{
+    for (int i = 0; i < get_size(a); i++)
+    {
+        append(b, get(a, i));
+    }
+}
+void undo(Stack* s, void* data, int tipo)
+{
+    if (tipo == MARCAR_TAREA)
+    {
+        tarea* original = (tarea*)data;
+        tarea* copy = (tarea*)malloc(sizeof(tarea));
+        copy->nombre = original->nombre;
+        copy->prioridad	= original->prioridad;
+        copy->precedentes = createList();
+        copyArraylist(copy->precedentes, original->precedentes);
+        pushStack((void*)copy,s);
+        return;
+    }
+    accion *accion = malloc(sizeof(accion));
+    accion->data = data;
+    accion->tipo = tipo;
+    pushStack(s, accion);
+}
+
+void deshacerAccion(Stack* s, HashMap* mapTareas)
+{
+    accion *ultima = (accion*)topStack(s);
+    if (ultima == NULL) return;
+
+    switch (ultima->tipo)
+    {
+        case AGREGAR_TAREA: ;
+            //Para agregar tarea se guarda:
+            //la id de la tarea para poder eliminar.
+        
+            eliminarTarea(mapTareas, ultima->data);
+            break;
+        case AGREGAR_PRECEDENCIA: ;
+            //Para agregar precedencia se guarda:
+            //un puntero a la tarea almacenda en el mapa de tareas
+            //la id no es necesaria, ya que se almacena en ultima posicion
+            tarea* current;
+            current = (tarea*)ultima->data;
+            pop(current->precedentes, -1);
+
+            break;
+        case MARCAR_TAREA: ;
+            //se guarda una copia de la tarea para poder deshacer   
+            tarea* past = (tarea*)ultima->data;
+            agregarTarea(mapTareas, past->nombre, past->prioridad);
+            tarea* new = searchMap(mapTareas, past->nombre)->value;
+            copyArraylist(past->precedentes, new->precedentes);
+            break;
+    }
+    popStack(s);
 }
 
 
