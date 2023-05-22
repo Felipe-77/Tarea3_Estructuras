@@ -63,6 +63,7 @@ Para poder guardar acciones pasadas usamos un stack que guarda un dato, y un int
  ---
 
 
+
 Rubrica Trabajo en equipo:
 
 -    Participacion activa y equitativa: 10
@@ -74,6 +75,12 @@ Rubrica Trabajo en equipo:
 -    Responsabilidad:11
 
 -    Comunicación:15
+
+Comentario sobre las calificaciones:
+Durante este trabajo, nos demoramos mas en empezar a escribir codigo, ya que no nos decidiamos que tipos de TDA usar. Sumado a eso no hubo mucho trabajo en conjunto, sino mas bien, hacer cada uno su parte, mandar el archivo modificado, o subir el commit.
+
+
+Aun asi hacemos un buen equipo juntos y entendemos bien la forma en que ambos escribimos codigo. Esperamos que en el proyecto podamos ser mas decisivos y directos a la hora de empezar a codificarlo.
 
 Criterio individual:
 
