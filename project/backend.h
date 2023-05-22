@@ -1,6 +1,10 @@
 #ifndef backend_h
 #define backend_h
 #include "map/map.h"
+#include "arraylist/arraylist.h"
+#define AGREGAR_TAREA 1
+#define AGREGAR_PRECEDENCIA 2
+#define MARCAR_TAREA 3
 
 typedef struct tarea tarea;
 
@@ -12,8 +16,8 @@ void mostrarTareasPorHacer(HashMap * map);
 int mostrarTarea(HashMap* mapTareas, char id[10]);
 void importarDesdeCSV(HashMap* map, char * archivo);
 
-
-
+void deshacerAccion(Stack* s, HashMap* mapTareas);
+void stackUndo(Stack* s, void* data, int tipo);
 
 
 

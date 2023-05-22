@@ -260,7 +260,7 @@ void copyArraylist(ArrayList* a, ArrayList* b)
         append(b, get(a, i));
     }
 }
-void undo(Stack* s, void* data, int tipo)
+void stackUndo(Stack* s, void* data, int tipo)
 {
     if (tipo == MARCAR_TAREA)
     {

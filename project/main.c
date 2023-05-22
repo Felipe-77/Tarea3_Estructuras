@@ -8,9 +8,7 @@
 #define MAXC 20
 #define SEP printf("\n**************************************************\n")
 
-#define AGREGAR_TAREA 1
-#define AGREGAR_PRECEDENCIA 2
-#define MARCAR_TAREA 3
+
 
 
 
@@ -21,6 +19,7 @@ int main(void)
     char precedente[MAXC];
     char archivo[30];
     int prioridad;
+    Stack* undo = createStack();
     HashMap * mapTareas = createMap(20);
     SEP;
     printf("¡Bienvenid@ al sistema para organizar tareas!\n");
@@ -57,6 +56,8 @@ int main(void)
                 printf("\nTarea agregada con éxito!\n");
             else
                 printf("\nHa ocurrido un error al agregar la tarea\n");
+            //agregar a la pila de undo
+            stackUndo(undo,id,AGREGAR_TAREA);
             break;
             
         case 2:
@@ -72,6 +73,7 @@ int main(void)
                 printf("\nPrecedencia añadida con éxito!\n");
             else
                 printf("\nHa ocurrido un error al agregar la precedencia\n");
+            stackUndo(undo,id,AGREGAR_PRECEDENCIA);
             break;
         case 3:
             SEP;
@@ -82,15 +84,17 @@ int main(void)
             printf("Ingrese el nombre de la tarea a eliminar:\n");
             scanf("%10[^\n]s", id);
             getchar();
-
+            //almacenar en undo
+            stackUndo(undo,searchMap(mapTareas,id)->value,MARCAR_TAREA);
+            printf("\n ya fue guardado en el stack undo\n");
             if (eliminarTarea(mapTareas, id) == 0)
                 printf("\nTarea eliminada con éxito!\n");
             else
                 printf("\nHa ocurrido un error al eliminar la tarea\n");
             break;
         case 5:
-            printf("todo\n");
-
+            printf("Deshaciendo...\n");
+            deshacerAccion(undo,mapTareas);
             break;
         case 6:
             SEP;
