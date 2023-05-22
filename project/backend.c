@@ -262,6 +262,7 @@ void copyArraylist(ArrayList* a, ArrayList* b)
 }
 void stackUndo(Stack* s, void* data, int tipo)
 {
+    accion *new = malloc(sizeof(accion));
     if (tipo == MARCAR_TAREA)
     {
         tarea* original = (tarea*)data;
@@ -270,29 +271,33 @@ void stackUndo(Stack* s, void* data, int tipo)
         copy->prioridad	= original->prioridad;
         copy->precedentes = createList();
         copyArraylist(copy->precedentes, original->precedentes);
-        pushStack((void*)copy,s);
+        new->data = (void*)copy;
+        new->tipo = tipo;
+        pushStack(s,new);
+        
         return;
     }
-    accion *accion = malloc(sizeof(accion));
-    accion->data = data;
-    accion->tipo = tipo;
-    pushStack(s, accion);
+    
+    new->data = data;
+    new->tipo = tipo;
+    pushStack(s, new);
 }
 
 void deshacerAccion(Stack* s, HashMap* mapTareas)
 {
     accion *ultima = (accion*)topStack(s);
     if (ultima == NULL) return;
-
+    
     switch (ultima->tipo)
     {
         case AGREGAR_TAREA: ;
             //Para agregar tarea se guarda:
             //la id de la tarea para poder eliminar.
-        
+            printf("asa\n");
             eliminarTarea(mapTareas, ultima->data);
             break;
         case AGREGAR_PRECEDENCIA: ;
+            printf("agregarPrecedencia\n");
             //Para agregar precedencia se guarda:
             //un puntero a la tarea almacenda en el mapa de tareas
             //la id no es necesaria, ya que se almacena en ultima posicion
@@ -302,6 +307,7 @@ void deshacerAccion(Stack* s, HashMap* mapTareas)
 
             break;
         case MARCAR_TAREA: ;
+            printf("marcarTarea\n");
             //se guarda una copia de la tarea para poder deshacer   
             tarea* past = (tarea*)ultima->data;
             agregarTarea(mapTareas, past->nombre, past->prioridad);
